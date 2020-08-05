@@ -1,6 +1,8 @@
 package com.example.demo;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -30,10 +32,13 @@ public class UserController {
             @RequestParam(required = false, defaultValue = "1")int page,
             @RequestParam(name = "item_per_page", required = false, defaultValue = "10")int itemPerPage) {
         PagingResponse pagingResponse = new PagingResponse(page, itemPerPage);
-        List<UserResponse> userResponseList = new ArrayList<>();
 
-        Iterable<User> users = userRepository.findAll();
-        for (User user: users) {
+        List<UserResponse> userResponseList = new ArrayList<>();
+        // page must -1 because first page is actually start from 0, but we want to start from 1 in link
+        Page<User> usersPagination = userRepository.findAll(PageRequest.of(page-1, itemPerPage));
+
+//        Iterable<User> users = userRepository.findAll();
+        for (User user: usersPagination.getContent()) {
             userResponseList.add(new UserResponse(user.getId(), user.getName(), user.getAge()));
         }
 
