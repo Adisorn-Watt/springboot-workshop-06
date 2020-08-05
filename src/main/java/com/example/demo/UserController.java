@@ -34,7 +34,7 @@ public class UserController {
 
         Iterable<User> users = userRepository.findAll();
         for (User user: users) {
-            userResponseList.add(new UserResponse(user.getId(), user.getName()));
+            userResponseList.add(new UserResponse(user.getId(), user.getName(), user.getAge()));
         }
 
         pagingResponse.setUserResponseList(userResponseList);
@@ -44,7 +44,7 @@ public class UserController {
     @GetMapping("/users/{id}")
     public UserResponse getUserById(@PathVariable int id) {
         Optional<User> user = userRepository.findById(id);
-        return new UserResponse(user.get().getId(), user.get().getName());
+        return new UserResponse(user.get().getId(), user.get().getName(), user.get().getAge());
     }
 
 
