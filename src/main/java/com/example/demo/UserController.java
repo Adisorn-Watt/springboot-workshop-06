@@ -5,18 +5,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class UserController {
 
-//    @GetMapping("/users")
-//    public List<UserResponse> getAllUser() {
-//        List<UserResponse> users = new ArrayList<>();
-//        users.add(new UserResponse(1, "User 1"));
-//        users.add(new UserResponse(2, "User 2"));
-//        users.add(new UserResponse(3, "User 3"));
-//        return users;
-//    }
     @Autowired
     private UserRepository userRepository;
 
@@ -38,9 +31,11 @@ public class UserController {
             @RequestParam(name = "item_per_page", required = false, defaultValue = "10")int itemPerPage) {
         PagingResponse pagingResponse = new PagingResponse(page, itemPerPage);
         List<UserResponse> userResponseList = new ArrayList<>();
-        userResponseList.add(new UserResponse(1, "User 1"));
-        userResponseList.add(new UserResponse(2, "User 2"));
-        userResponseList.add(new UserResponse(3, "User 3"));
+
+        Iterable<User> users = userRepository.findAll();
+        for (User user: users) {
+            userResponseList.add(new UserResponse(user.getId(), user.getName()));
+        }
 
         pagingResponse.setUserResponseList(userResponseList);
         return pagingResponse;
@@ -48,7 +43,8 @@ public class UserController {
 
     @GetMapping("/users/{id}")
     public UserResponse getUserById(@PathVariable int id) {
-        return new UserResponse(id, "User " + id);
+        Optional<User> user = userRepository.findById(id);
+        return new UserResponse(user.get().getId(), user.get().getName());
     }
 
 
