@@ -1,9 +1,9 @@
 package com.example.demo;
 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 public class UserController {
@@ -18,13 +18,27 @@ public class UserController {
 //    }
     // Test req param
     @GetMapping("/users")
-    public String getPage (@RequestParam(required = false, defaultValue = "1")int page, @RequestParam(required = false, defaultValue = "10")int itemPerPage) {
-        return "Page: " +page+ ", itemPerPage: " +itemPerPage;
+    public PagingResponse getAllUser (
+            @RequestParam(required = false, defaultValue = "1")int page,
+            @RequestParam(name = "item_per_page", required = false, defaultValue = "10")int itemPerPage) {
+        PagingResponse pagingResponse = new PagingResponse(page, itemPerPage);
+        List<UserResponse> userResponseList = new ArrayList<>();
+        userResponseList.add(new UserResponse(1, "User 1"));
+        userResponseList.add(new UserResponse(2, "User 2"));
+        userResponseList.add(new UserResponse(3, "User 3"));
+
+        pagingResponse.setUserResponseList(userResponseList);
+        return pagingResponse;
     }
 
     @GetMapping("/users/{id}")
     public UserResponse getUserById(@PathVariable int id) {
         return new UserResponse(id, "User " + id);
+    }
+
+    @PostMapping("/users")
+    public UserResponse createNewUser(@RequestBody NewUserRequest request) {
+        return new UserResponse(0, request.getName() + request.getAge());
     }
 
 }
